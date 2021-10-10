@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - lts
+          - lts/*
           - 16
 
     steps:
