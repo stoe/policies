@@ -1,0 +1,53 @@
+name: Node Publish
+
+on:
+  workflow_call:
+    secrets:
+      npm_token:
+        required: false
+      gh_token:
+        required: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: publish-${{ github.ref }}
+      cancel-in-progress: true
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      CI: true
+
+    steps:
+      - uses: actions/checkout@v2.3.4
+
+      - uses: actions/setup-node@v2.4.1
+        if: ${{ secrets.npm_token }}
+        with:
+          node-version: 14.x
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@stoe'
+
+      # Publish to npm
+      - run: npm publish --access public
+        if: ${{ secrets.npm_token }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+
+      - uses: actions/setup-node@v2.4.1
+        if: ${{ secrets.gh_token }}
+        with:
+          node-version: 14.x
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@stoe'
+
+      # Publish to GitHub Packages
+      - run: npm publish --access public
+        if: ${{ secrets.gh_token }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.gh_token }}
