@@ -43,4 +43,4 @@ jobs:
     needs: test-matrix
 
     steps:
-      - run: echo ok
+      - run: echo "success"
