@@ -15,22 +15,22 @@ on:
       npm_token:
         required: false
 
-concurrency:
-  group: publish-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  CI: true
-
-permissions:
-  contents: read
-  packages: write
-
 jobs:
   publish_npm:
     if: ${{ inputs.npm }}
 
     runs-on: ubuntu-latest
+
+    concurrency:
+      group: publish-npm-${{ github.ref }}
+      cancel-in-progress: true
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      CI: true
 
     steps:
       - uses: actions/checkout@v2.3.4
@@ -49,6 +49,17 @@ jobs:
     if: ${{ inputs.gh }}
 
     runs-on: ubuntu-latest
+
+    concurrency:
+      group: publish-gh-${{ github.ref }}
+      cancel-in-progress: true
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      CI: true
 
     steps:
       - uses: actions/checkout@v2.3.4

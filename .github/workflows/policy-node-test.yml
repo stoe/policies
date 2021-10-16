@@ -3,18 +3,18 @@ name: Node Test
 on:
   workflow_call:
 
-concurrency:
-  group: test-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  CI: true
-
-permissions: read-all
-
 jobs:
   test-matrix:
     runs-on: ubuntu-latest
+
+    concurrency:
+      group: test-${{ github.ref }}
+      cancel-in-progress: true
+
+    permissions: read-all
+
+    env:
+      CI: true
 
     strategy:
       matrix:
