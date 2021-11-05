@@ -27,7 +27,7 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@stoe'
 
-      - name: lerna publish
+      - name: npm install
         run: |
           npm set-script prepare ""
           npm install --ignore-scripts --pure-lockfile

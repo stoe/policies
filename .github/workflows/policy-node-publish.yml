@@ -41,6 +41,12 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           scope: '@stoe'
 
+      - name: npm install
+        run: |
+          npm set-script prepare ""
+          npm install --ignore-scripts --pure-lockfile
+          git ls-files -z . | xargs -0 git update-index --assume-unchanged
+
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
@@ -69,6 +75,12 @@ jobs:
           node-version: 14.x
           registry-url: 'https://npm.pkg.github.com'
           scope: '@stoe'
+
+      - name: npm install
+        run: |
+          npm set-script prepare ""
+          npm install --ignore-scripts --pure-lockfile
+          git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
       - run: npm publish --access public
         env:
