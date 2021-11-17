@@ -32,7 +32,7 @@ jobs:
           npm set-script prepare ""
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
-          
+
       - run: npx lerna publish from-package --yes --registry https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
