@@ -1,0 +1,87 @@
+name: Node Workspaces Publish
+
+on:
+  workflow_call:
+    inputs:
+      npm:
+        description: 'Publish workspaces to npm'
+        type: boolean
+        default: false
+      gh:
+        description: 'Publish workspaces to GitHub Packages'
+        type: boolean
+        default: false
+    secrets:
+      npm_token:
+        required: false
+
+jobs:
+  publish_npm:
+    if: ${{ inputs.npm }}
+
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: publish-workspaces-npm-${{ github.ref }}
+      cancel-in-progress: true
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      CI: true
+
+    steps:
+      - uses: actions/checkout@v2.4.0
+
+      - uses: actions/setup-node@v2.5.1
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@stoe'
+
+      - name: npm install
+        run: |
+          npm set-script prepare ""
+          npm install --ignore-scripts --pure-lockfile
+          git ls-files -z . | xargs -0 git update-index --assume-unchanged
+
+      - run: npm run publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+
+  publish_gh:
+    if: ${{ inputs.gh }}
+
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: publish-workspaces-gh-${{ github.ref }}
+      cancel-in-progress: true
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      CI: true
+
+    steps:
+      - uses: actions/checkout@v2.4.0
+
+      - uses: actions/setup-node@v2.5.1
+        with:
+          node-version: 16
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@stoe'
+
+      - name: npm install
+        run: |
+          npm set-script prepare ""
+          npm install --ignore-scripts --pure-lockfile
+          git ls-files -z . | xargs -0 git update-index --assume-unchanged
+
+      - run: npm run publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
