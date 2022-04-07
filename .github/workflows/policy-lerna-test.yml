@@ -28,6 +28,7 @@ jobs:
           lfs: true
 
       - uses: actions/dependency-review-action@v1
+        if: ${{ github.event_name }} == 'pull_request'
 
       - uses: actions/setup-node@v3.0.0
         with:
