@@ -11,7 +11,8 @@ jobs:
       group: test-${{ github.ref }}
       cancel-in-progress: true
 
-    permissions: read-all
+    permissions:
+      contents: read
 
     env:
       CI: true
@@ -23,6 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/dependency-review-action@v1
 
       - uses: actions/setup-node@v3.0.0
         with:
