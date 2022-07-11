@@ -28,7 +28,7 @@ jobs:
       - uses: actions/dependency-review-action@v2
         if: github.event_name == 'pull_request'
 
-      - uses: actions/setup-node@v3.3.0
+      - uses: actions/setup-node@v3.4.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
