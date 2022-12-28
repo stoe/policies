@@ -17,7 +17,7 @@ jobs:
     env:
       CI: true
 
-    continue-on-error: ${{ matrix.node-version }}
+    continue-on-error: true
     strategy:
       matrix:
         node-version:
