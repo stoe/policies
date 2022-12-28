@@ -7,10 +7,6 @@ jobs:
   test-matrix:
     runs-on: ubuntu-latest
 
-    concurrency:
-      group: lerna-test-${{ github.ref }}
-      cancel-in-progress: true
-
     permissions:
       contents: read
 
@@ -24,6 +20,10 @@ jobs:
           - 16
           - 18
           - 19
+
+    concurrency:
+      group: lerna-test-${{ github.ref }}-${{ matrix.node-version }}
+      cancel-in-progress: true
 
     steps:
       - uses: actions/checkout@dc323e67f16fb5f7663d20ff7941f27f5809e9b6
