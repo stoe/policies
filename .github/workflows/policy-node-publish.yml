@@ -43,7 +43,7 @@ jobs:
 
       - name: npm install
         run: |
-          npm set-script prepare ""
+          npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
@@ -78,7 +78,7 @@ jobs:
 
       - name: npm install
         run: |
-          npm set-script prepare ""
+          npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
