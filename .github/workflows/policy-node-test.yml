@@ -17,10 +17,13 @@ jobs:
     env:
       CI: true
 
+    continue-on-error: ${{ matrix.node-version }}
     strategy:
       matrix:
         node-version:
           - 16
+          - 18
+          - 19
 
     steps:
       - uses: actions/checkout@dc323e67f16fb5f7663d20ff7941f27f5809e9b6
