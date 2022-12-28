@@ -13,13 +13,11 @@ jobs:
     env:
       CI: true
 
-    continue-on-error: true
     strategy:
       matrix:
         node-version:
           - 16
           - 18
-          - 19
 
     concurrency:
       group: lerna-test-${{ github.ref }}-${{ matrix.node-version }}
