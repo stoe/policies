@@ -9,6 +9,7 @@ jobs:
 
     permissions:
       contents: read
+      packages: read
 
     env:
       CI: true
