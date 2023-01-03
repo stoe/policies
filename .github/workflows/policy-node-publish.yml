@@ -31,6 +31,7 @@ jobs:
 
     env:
       CI: true
+      NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
 
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
@@ -48,8 +49,6 @@ jobs:
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
       - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
 
   publish_gh:
     if: ${{ inputs.gh }}
@@ -66,6 +65,7 @@ jobs:
 
     env:
       CI: true
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
@@ -83,5 +83,3 @@ jobs:
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
       - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

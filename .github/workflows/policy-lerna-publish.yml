@@ -17,6 +17,7 @@ jobs:
 
     env:
       CI: true
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
@@ -34,5 +35,3 @@ jobs:
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
       - run: npx lerna publish from-package --yes --registry https://npm.pkg.github.com
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

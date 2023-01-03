@@ -9,9 +9,11 @@ jobs:
 
     permissions:
       contents: read
+      packages: read
 
     env:
       CI: true
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
       matrix:
@@ -31,6 +33,7 @@ jobs:
       - uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516
         with:
           node-version: ${{ matrix.node-version }}
+          registry-url: 'https://npm.pkg.github.com'
           cache: 'npm'
 
       - run: npm install --ignore-scripts --pure-lockfile
