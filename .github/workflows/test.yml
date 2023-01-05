@@ -18,4 +18,4 @@ permissions:
 
 jobs:
   test:
-    uses: stoe/policies/.github/workflows/policy-node-test.yml@main
+    uses: stoe/policies/.github/workflows/policy-node-test.yml@stoe/node-test-matrix
