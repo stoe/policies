@@ -15,11 +15,17 @@ jobs:
       CI: true
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    continue-on-error: ${{ matrix.allow-failure }}
     strategy:
+      fail-fast: true
       matrix:
         node-version:
           - 16
           - 18
+        allow-failure: [false]
+        include:
+          - node-version: 19
+            allow-failure: true
 
     concurrency:
       group: test-${{ github.ref }}-${{ matrix.node-version }}
