@@ -1,4 +1,4 @@
-name: Lerna Test
+name: test
 
 on:
   workflow_call:

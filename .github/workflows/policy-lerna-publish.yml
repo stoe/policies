@@ -1,4 +1,4 @@
-name: Lerna Publish
+name: publish
 
 on:
   workflow_call:

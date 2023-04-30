@@ -1,4 +1,4 @@
-name: Node Workspaces Publish
+name: publish
 
 on:
   workflow_call:
