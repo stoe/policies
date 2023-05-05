@@ -1,4 +1,4 @@
-name: publish
+name: reusable publish (public)
 
 on:
   workflow_call:

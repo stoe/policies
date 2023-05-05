@@ -1,4 +1,4 @@
-name: test
+name: reusable test (lerna)
 
 on:
   workflow_call:

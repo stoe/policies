@@ -1,4 +1,4 @@
-name: publish
+name: reusable publish (lerna)
 
 on:
   workflow_call:
