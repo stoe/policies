@@ -14,7 +14,8 @@ jobs:
       contents: read
 
     steps:
-      - id: visibility
+      - name: Get repository visibility
+        id: visibility
         run: |
           echo "isPublic=$(gh repo view --json visibility | jq -r '.visibility == "PUBLIC"')" >> $GITHUB_OUTPUT
 
@@ -42,19 +43,23 @@ jobs:
     needs: [repo-visibility]
 
     steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - name: Checkout
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
 
-      - uses: actions/dependency-review-action@f46c48ed6d4f1227fb2d9ea62bf6bcbed315589e
+      - name: Check repository dependency graph
+        uses: actions/dependency-review-action@f46c48ed6d4f1227fb2d9ea62bf6bcbed315589e
         if: ${{ github.event_name == 'pull_request' && needs.repo-visibility.outputs.isPublic == 'true' }}
 
-      - uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
+      - name: Setup Node.js v${{ matrix.node-version }}
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://npm.pkg.github.com'
           scope: '@stoe'
           cache: 'npm'
 
-      - run: |
+      - name: Build and test
+        run: |
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
 
@@ -68,4 +73,5 @@ jobs:
     needs: test-matrix
 
     steps:
-      - run: echo "success"
+      - name: Success
+        run: echo "success"
