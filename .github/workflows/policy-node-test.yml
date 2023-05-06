@@ -31,13 +31,19 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
+      fail-fast: true
       matrix:
         node-version:
-          - 16
           - 18
+        canFail: [true]
+        include:
+          - node-version: 16
+            canFail: false
+
+    continue-on-error: ${{ matrix.canFail }}
 
     concurrency:
-      group: test-${{ github.ref }}-${{ matrix.node-version }}
+      group: test-${{ github.ref }}-${{ matrix.node-version }}-${{ matrix.canFail }}
       cancel-in-progress: true
 
     needs: [repo-visibility]
