@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: combine-prs
+      - name: Combine Dependabot PRs
         id: combine-prs
         uses: github/combine-prs@8e631fc3eb9337039c61b2b89219bf2a2259a4d6
         with:

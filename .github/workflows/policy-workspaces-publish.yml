@@ -4,13 +4,13 @@ on:
   workflow_call:
     inputs:
       npm:
-        description: 'Publish workspaces to npm'
+        description: 'Publish workspaces to NPM'
         type: boolean
         default: false
       gh:
         description: 'Publish workspaces to GitHub Packages'
         type: boolean
-        default: false
+        default: true
     secrets:
       npm_token:
         required: false
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     concurrency:
-      group: publish-workspaces-npm-${{ github.ref }}
+      group: ${{ github.workflow }}-npm-${{ github.ref }}
       cancel-in-progress: true
 
     permissions:
@@ -34,21 +34,24 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
 
     steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - name: Checkout
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
 
-      - uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
+      - name: Setup Node.js
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
         with:
           node-version: 16
           registry-url: 'https://registry.npmjs.org'
           scope: '@stoe'
 
-      - name: npm install
+      - name: NPM config
         run: |
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
-      - run: npm run publish
+      - name: NPM publish
+        run: npm run publish
 
   publish_gh:
     if: ${{ inputs.gh }}
@@ -56,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
 
     concurrency:
-      group: publish-workspaces-gh-${{ github.ref }}
+      group: ${{ github.workflow }}-gh-${{ github.ref }}
       cancel-in-progress: true
 
     permissions:
@@ -68,18 +71,21 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - name: Checkout
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
 
-      - uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
+      - name: Setup Node.js
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
         with:
           node-version: 16
           registry-url: 'https://npm.pkg.github.com'
           scope: '@stoe'
 
-      - name: npm install
+      - name: NPM config
         run: |
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
-      - run: npm run publish
+      - name: GitHub Packages publish
+        run: npm run publish

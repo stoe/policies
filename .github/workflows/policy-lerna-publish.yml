@@ -2,13 +2,64 @@ name: reusable publish (lerna)
 
 on:
   workflow_call:
+    inputs:
+      npm:
+        description: 'Publish lerna monorepo to NPM'
+        type: boolean
+        default: false
+      gh:
+        description: 'Publish lerna monorepo to GitHub Packages'
+        type: boolean
+        default: true
+    secrets:
+      npm_token:
+        required: false
 
 jobs:
-  publish:
+  publish_npm:
+    if: ${{ inputs.npm }}
+
     runs-on: ubuntu-latest
 
     concurrency:
-      group: lerna-publish-${{ github.ref }}
+      group: ${{ github.workflow }}-npm-${{ github.ref }}
+      cancel-in-progress: true
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      CI: true
+      NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+
+      - name: Setup Node.js
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@stoe'
+
+      - name: NPM config
+        run: |
+          npm pkg delete scripts.prepare
+          npm install --ignore-scripts --pure-lockfile
+          git ls-files -z . | xargs -0 git update-index --assume-unchanged
+
+      - name: GitHub Packages publish
+        run: npx lerna publish from-package --yes --registry https://registry.npmjs.org
+
+  publish_gh:
+    if: ${{ inputs.gh }}
+
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-gh-${{ github.ref }}
       cancel-in-progress: true
 
     permissions:
@@ -20,18 +71,21 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - name: Checkout
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
 
-      - uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
+      - name: Setup Node.js
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
         with:
           node-version: 16
           registry-url: 'https://npm.pkg.github.com'
           scope: '@stoe'
 
-      - name: npm install
+      - name: NPM config
         run: |
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
-      - run: npx lerna publish from-package --yes --registry https://npm.pkg.github.com
+      - name: GitHub Packages publish
+        run: npx lerna publish from-package --yes --registry https://npm.pkg.github.com

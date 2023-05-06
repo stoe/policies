@@ -17,7 +17,7 @@ jobs:
       - name: Get repository visibility
         id: visibility
         run: |
-          echo "isPublic=$(gh repo view --json visibility | jq -r '.visibility == "PUBLIC"')" >> $GITHUB_OUTPUT
+          echo "isPublic=$(gh repo view --json visibility | jq -r '.visibility == "PUBLIC"')" >> "$GITHUB_OUTPUT"
 
   test-matrix:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
     continue-on-error: ${{ matrix.canFail }}
 
     concurrency:
-      group: test-${{ github.ref }}-${{ matrix.node-version }}-${{ matrix.canFail }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.node-version }}-${{ matrix.canFail }}
       cancel-in-progress: true
 
     needs: [repo-visibility]
@@ -64,14 +64,16 @@ jobs:
           scope: '@stoe'
           cache: 'npm'
 
-      - name: Build and test
+      - name: NPM config
         run: |
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
 
-      - run: npm run build --if-present
+      - name: Build
+        run: npm run build --if-present
 
-      - run: npm run test --if-present
+      - name: Test
+        run: npm run test --if-present
 
   test:
     runs-on: ubuntu-latest
