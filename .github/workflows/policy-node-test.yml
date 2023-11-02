@@ -19,11 +19,11 @@ jobs:
       fail-fast: true
       matrix:
         node-version:
-          - 16
           - 18
+          - 20
         experimental: [false]
         include:
-          - node-version: 20
+          - node-version: lts/*
             experimental: true
 
     continue-on-error: ${{ matrix.experimental }}

@@ -18,8 +18,8 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 16
           - 18
+          - 20
 
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.node-version }}
