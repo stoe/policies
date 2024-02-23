@@ -45,11 +45,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check repository dependency graph
-        uses: actions/dependency-review-action@01bc87099ba56df1e897b6874784491ea6309bc4
+        uses: actions/dependency-review-action@9129d7d40b8c12c1ed0f60400d00c92d437adcce
         if: ${{ github.event_name == 'pull_request' && steps.visibility.outputs.isPrivate == 'false' }}
 
       - name: Setup Node.js v${{ matrix.node-version }}
-        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://npm.pkg.github.com'
