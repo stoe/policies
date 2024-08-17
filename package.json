@@ -1,6 +1,7 @@
 {
   "name": "@stoe/policies",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "description": "Shared policies and workflows",
   "keywords": [
@@ -15,21 +16,23 @@
   "license": "MIT",
   "repository": "github:stoe/policies",
   "engines": {
-    "node": ">=16",
-    "npm": ">=8"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "scripts": {
-    "format": "npx prettier --config-precedence prefer-file --write . && (eslint . --fix || true)",
-    "pretest": "npx eslint-config-prettier .eslintrc.json",
-    "test": "eslint . || true",
+    "format": "npx prettier --config-precedence prefer-file --write . && eslint . --fix",
     "prepare": "husky",
+    "pretest": "npx eslint-config-prettier eslint.config.js",
+    "test": "eslint ."
   },
   "dependencies": {},
   "devDependencies": {
     "@github/prettier-config": "^0.0.6",
-    "eslint": "^8.57.0",
+    "eslint": "^9.9.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-github": "^5.0.1",
+    "eslint-plugin-markdown": "^5.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.9.0",
     "husky": "^9.1.4",
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3"
