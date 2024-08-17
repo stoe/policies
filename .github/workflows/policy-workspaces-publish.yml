@@ -17,6 +17,7 @@ on:
 
 jobs:
   publish_npm:
+    name: Publish to NPM
     if: ${{ inputs.npm }}
 
     runs-on: ubuntu-latest
@@ -28,6 +29,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     env:
       CI: true
@@ -51,9 +53,10 @@ jobs:
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
       - name: NPM publish
-        run: npm run publish
+        run: npm publish --provenance --access public --workspaces
 
   publish_gh:
+    name: Publish to GitHub
     if: ${{ inputs.gh }}
 
     runs-on: ubuntu-latest
@@ -88,4 +91,4 @@ jobs:
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
 
       - name: GitHub Packages publish
-        run: npm run publish
+        run: npm publish --access public --workspaces

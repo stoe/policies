@@ -19,10 +19,11 @@ jobs:
       fail-fast: true
       matrix:
         node-version:
-          - 18
           - 20
         experimental: [false]
         include:
+          - node-version: 22
+            experimental: true
           - node-version: lts/*
             experimental: true
 
