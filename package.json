@@ -1,6 +1,6 @@
 {
   "name": "@stoe/policies",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "private": true,
   "description": "Shared policies and workflows",
@@ -20,15 +20,15 @@
     "npm": ">=10"
   },
   "scripts": {
-    "format": "npx prettier --config-precedence prefer-file --write . && eslint . --fix",
+    "format": "npx prettier --config-precedence prefer-file --write . && eslint -c eslint.config.js . --fix",
     "prepare": "husky",
     "pretest": "npx eslint-config-prettier eslint.config.js",
-    "test": "eslint ."
+    "test": "eslint -c eslint.config.js ."
   },
   "dependencies": {},
   "devDependencies": {
     "@github/prettier-config": "^0.0.6",
-    "eslint": "^9.9.0",
+    "eslint": "^9.11.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-markdown": "^5.1.0",
     "eslint-plugin-prettier": "^5.2.1",
@@ -37,7 +37,6 @@
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3"
   },
-  "prettier": "@github/prettier-config",
   "husky": {
     "hooks": {
       "pre-commit": ".husky/pre-commit",
@@ -52,5 +51,6 @@
     "*.{json,md}": [
       "prettier --write"
     ]
-  }
+  },
+  "prettier": "@github/prettier-config"
 }
