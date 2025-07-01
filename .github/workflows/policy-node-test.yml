@@ -79,7 +79,7 @@ jobs:
       - name: List the state of node modules
         if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         continue-on-error: true
-        run: npm list
+        run: npm list --omit=dev
 
       - name: NPM config
         run: |
