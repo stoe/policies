@@ -11,9 +11,6 @@ on:
         description: 'Publish to GitHub Packages'
         type: boolean
         default: true
-    secrets:
-      npm_token:
-        required: false
 
 env:
   NODE_VERSION: 22
@@ -36,7 +33,6 @@ jobs:
 
     env:
       CI: true
-      NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
 
     steps:
       - name: Checkout
@@ -74,7 +70,6 @@ jobs:
 
     env:
       CI: true
-      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout
