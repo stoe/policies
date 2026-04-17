@@ -23,7 +23,7 @@ jobs:
           - 24
         optional: [false]
         include:
-          - node-version: 24
+          - node-version: 25
             optional: true
           - node-version: lts/*
             optional: true
