@@ -19,19 +19,19 @@ jobs:
       fail-fast: true
       matrix:
         node-version:
-          - 20
           - 22
-        experimental: [false]
+          - 24
+        optional: [false]
         include:
           - node-version: 24
-            experimental: true
+            optional: true
           - node-version: lts/*
-            experimental: true
+            optional: true
 
-    continue-on-error: ${{ matrix.experimental }}
+    continue-on-error: ${{ matrix.optional }}
 
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.node-version }}-${{ matrix.experimental }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.node-version }}-${{ matrix.optional }}
       cancel-in-progress: true
 
     steps:
