@@ -15,11 +15,10 @@ jobs:
       matrix:
         node-version:
           - 24
-          - 24
         experimental:
           - false
         include:
-          - node-version: 24
+          - node-version: 26
             experimental: true
           - node-version: lts/*
             experimental: true

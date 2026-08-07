@@ -15,11 +15,10 @@ jobs:
       matrix:
         node-version:
           - 24
-          - 24
         optional:
           - false
         include:
-          - node-version: 25
+          - node-version: 26
             optional: true
           - node-version: lts/*
             optional: true
