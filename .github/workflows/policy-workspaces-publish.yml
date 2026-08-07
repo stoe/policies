@@ -1,98 +1,78 @@
 name: reusable publish (workspace package)
-
 on:
   workflow_call:
     inputs:
       npm:
-        description: 'Publish workspaces to NPM'
+        description: Publish workspaces to NPM
         type: boolean
         default: false
       gh:
-        description: 'Publish workspaces to GitHub Packages'
+        description: Publish workspaces to GitHub Packages
         type: boolean
         default: true
     secrets:
       npm_token:
         required: false
-
 env:
   NODE_VERSION: 22
-  NPM_SCOPE: '@stoe'
-
+  NPM_SCOPE: "@stoe"
 jobs:
   publish_npm:
     name: Publish to NPM
     if: ${{ inputs.npm }}
-
     runs-on: ubuntu-latest
-
     concurrency:
       group: ${{ github.workflow }}-npm-${{ github.ref }}
       cancel-in-progress: true
-
     permissions:
       contents: read
       packages: write
       id-token: write
-
     env:
       CI: true
       NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
-
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 24
           scope: ${{ env.NPM_SCOPE }}
-          registry-url: 'https://registry.npmjs.org'
-
+          registry-url: https://registry.npmjs.org
       - name: NPM config
         run: |
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
-
       - name: NPM publish
         run: npm publish --provenance --access public --workspaces
-
   publish_gh:
     name: Publish to GitHub
     if: ${{ inputs.gh }}
-
     runs-on: ubuntu-latest
-
     concurrency:
       group: ${{ github.workflow }}-gh-${{ github.ref }}
       cancel-in-progress: true
-
     permissions:
       contents: read
       packages: write
-
     env:
       CI: true
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 24
           scope: ${{ env.NPM_SCOPE }}
-          registry-url: 'https://npm.pkg.github.com'
-
+          registry-url: https://npm.pkg.github.com
       - name: NPM config
         run: |
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
-
       - name: GitHub Packages publish
         run: npm publish --access public --workspaces
