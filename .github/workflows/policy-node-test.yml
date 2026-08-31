@@ -69,7 +69,7 @@ jobs:
       - name: NPM config
         run: |
           npm pkg delete scripts.prepare
-          npm install --ignore-scripts --pure-lockfile
+          npm install --ignore-scripts
       - name: List the state of node modules
         if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         continue-on-error: true
