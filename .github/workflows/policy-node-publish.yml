@@ -12,7 +12,7 @@ on:
         default: true
 env:
   NODE_VERSION: 24
-  NPM_SCOPE: "@stoe"
+  NPM_SCOPE: '@stoe'
 jobs:
   publish_npm:
     if: ${{ inputs.npm }}

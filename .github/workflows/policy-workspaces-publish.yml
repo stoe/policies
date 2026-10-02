@@ -15,7 +15,7 @@ on:
         required: false
 env:
   NODE_VERSION: 24
-  NPM_SCOPE: "@stoe"
+  NPM_SCOPE: '@stoe'
 jobs:
   publish_npm:
     name: Publish to NPM

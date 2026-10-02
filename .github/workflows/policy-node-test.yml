@@ -47,7 +47,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://npm.pkg.github.com
-          scope: "@stoe"
+          scope: '@stoe'
           cache: npm
       - name: Get NPM cache directory
         id: npm-cache-dir
