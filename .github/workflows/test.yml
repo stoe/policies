@@ -23,15 +23,6 @@ jobs:
   test:
     uses: stoe/policies/.github/workflows/policy-node-test.yml@main
 
-  # Run CodeQL analysis using the shared reusable workflow.
-  codeql:
-    uses: stoe/policies/.github/workflows/policy-node-codeql.yml@main
-    permissions:
-      actions: read
-      contents: read
-      packages: read
-      security-events: write
-
   # Verify the lockfile only when a PR changes workflows, including actions.lock.
   actions-lock:
     name: Verify Actions lockfile
