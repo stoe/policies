@@ -1,5 +1,6 @@
 import globals from 'globals'
 import markdown from 'eslint-plugin-markdown'
+import yml from 'eslint-plugin-yml'
 import prettierConfig from 'eslint-config-prettier'
 import prettierPluginRecommended from 'eslint-plugin-prettier/recommended'
 
@@ -15,18 +16,11 @@ export default [
       },
       parserOptions: {ecmaVersion: 'latest', sourceType: 'module'},
     },
-    plugins: {markdown},
     rules: {
       'prettier/prettier': 'error',
     },
   },
   ...markdown.configs.recommended,
-  {
-    files: ['**/*.md'],
-    processor: 'markdown/markdown',
-  },
-  {
-    files: ['**/*.md/*.js'],
-    rules: {},
-  },
+  ...yml.configs.recommended,
+  ...yml.configs.prettier,
 ]
