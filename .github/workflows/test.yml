@@ -19,3 +19,42 @@ permissions:
 jobs:
   test:
     uses: stoe/policies/.github/workflows/policy-node-test.yml@main
+
+  # Verify the lockfile only when a PR changes workflows, including actions.lock.
+  actions-lock:
+    name: Verify Actions lockfile
+    if: ${{ github.event_name == 'pull_request' }}
+
+    runs-on: ubuntu-slim
+
+    permissions:
+      contents: read
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          # The PR base and head SHAs must both be available for the diff.
+          fetch-depth: 0
+
+      - name: Check for workflow changes
+        id: workflow-changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if git diff --quiet "$BASE_SHA" "$HEAD_SHA" -- .github/workflows; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No workflow changes; skipping Actions lock verification."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify Actions lockfile
+        if: ${{ steps.workflow-changes.outputs.changed == 'true' }}
+        run: |
+          gh extension install github/gh-actions-lock --pin v0.2.0
+          gh actions-lock --verify
