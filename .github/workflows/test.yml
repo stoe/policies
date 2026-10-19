@@ -1,24 +1,31 @@
-name: test
+name: Node.js CI
 
+# Run tests for code changes, but skip changes limited to Markdown files.
 on:
   push:
     branches:
       - main
     paths-ignore:
-      - '*.md'
+      - '**/*.md'
+
   pull_request:
     branches:
       - main
     paths-ignore:
-      - '*.md'
+      - '**/*.md'
 
 permissions:
   contents: read
   packages: read
 
 jobs:
+  # Run Node.js tests using the shared reusable workflow.
   test:
     uses: stoe/policies/.github/workflows/policy-node-test.yml@main
+
+  # Run CodeQL analysis using the shared reusable workflow.
+  codeql:
+    uses: stoe/policies/.github/workflows/policy-node-codeql.yml@main
 
   # Verify the lockfile only when a PR changes workflows, including actions.lock.
   actions-lock:
