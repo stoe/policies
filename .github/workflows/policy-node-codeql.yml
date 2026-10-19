@@ -2,7 +2,7 @@ name: CodeQL analysis (reusable)
 
 # Called by repositories that enable the shared JavaScript/TypeScript analysis.
 on:
-  workflow_call:
+  workflow_call: {}
 
 jobs:
   codeql:

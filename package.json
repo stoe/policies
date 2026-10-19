@@ -25,13 +25,13 @@
     "pretest": "npx eslint-config-prettier eslint.config.js",
     "test": "eslint -c eslint.config.js ."
   },
-  "dependencies": {},
   "devDependencies": {
     "@github/prettier-config": "^0.0.6",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-markdown": "^5.1.0",
     "eslint-plugin-prettier": "^5.5.7",
+    "eslint-plugin-yml": "^3.9.0",
     "globals": "^17.13.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
@@ -50,6 +50,10 @@
     ],
     "*.{json,md}": [
       "prettier --write"
+    ],
+    "*.{yaml,yml}": [
+      "prettier --write",
+      "eslint -c eslint.config.js"
     ]
   },
   "prettier": "@github/prettier-config"

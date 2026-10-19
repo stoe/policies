@@ -2,7 +2,7 @@ name: Node.js tests (reusable)
 
 # Called by repositories that use the shared Node.js build and test policy.
 on:
-  workflow_call: null
+  workflow_call: {}
 
 jobs:
   test-matrix:
