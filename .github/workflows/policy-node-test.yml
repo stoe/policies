@@ -1,15 +1,22 @@
-name: reusable test
+name: Node.js tests (reusable)
+
+# Called by repositories that use the shared Node.js build and test policy.
 on:
   workflow_call: null
+
 jobs:
   test-matrix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+
     permissions:
       contents: read
       packages: read
+
     env:
       CI: true
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Node 24 is required; newer and current LTS versions are informational.
     strategy:
       fail-fast: true
       matrix:
@@ -22,40 +29,50 @@ jobs:
             optional: true
           - node-version: lts/*
             optional: true
+
     continue-on-error: ${{ matrix.optional }}
+
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.node-version }}-${{
         matrix.optional }}
       cancel-in-progress: true
+
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@v7.0.1
+
       - name: Check repository visibility
+        # Dependency review requires a public repository dependency graph.
         if: ${{ github.event_name == 'pull_request' }}
         id: visibility
         run: >
           echo "isPrivate=$(gh repo view --json isPrivate --jq '.isPrivate')" >>
-          $GITHUB_OUTPUT
+          "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Check repository dependency graph
-        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294
+        uses: actions/dependency-review-action@v5.0.0
         if: ${{ github.event_name == 'pull_request' &&
           steps.visibility.outputs.isPrivate == 'false' }}
+
       - name: Setup Node.js v${{ matrix.node-version }}
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://npm.pkg.github.com
           scope: '@stoe'
           cache: npm
+
       - name: Get NPM cache directory
         id: npm-cache-dir
         run: |
           echo "NPM_CACHE_DIR=$(npm config get cache)" >> "$GITHUB_OUTPUT"
+
+      # Cache npm's download store, keyed by lockfiles, rather than node_modules.
       - name: Cache node modules
         id: cache-npm
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        uses: actions/cache@v6.1.0
         env:
           cache-name: cache-node-modules
         with:
@@ -66,21 +83,29 @@ jobs:
             npm-${{ runner.os }}-${{ env.cache-name }}-
             npm-${{ runner.os }}-
             npm-
+
       - name: NPM config
         run: |
+          # Skip package prepare scripts when installing dependencies in CI.
           npm pkg delete scripts.prepare
           npm install --ignore-scripts
+
       - name: List the state of node modules
         if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
         continue-on-error: true
         run: npm list --omit=dev
+
       - name: Build
         run: npm run build --if-present
+
       - name: Test
         run: npm run test --if-present
+
   test:
-    runs-on: ubuntu-latest
+    # Provide one stable required check even when optional matrix legs fail.
+    runs-on: ubuntu-slim
     needs: test-matrix
+
     steps:
       - name: Success
         run: echo "success"

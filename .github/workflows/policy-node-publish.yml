@@ -1,4 +1,6 @@
-name: reusable publish (package)
+name: Node.js package publishing (reusable)
+
+# Callers can publish to either registry or both by setting these inputs.
 on:
   workflow_call:
     inputs:
@@ -10,63 +12,84 @@ on:
         description: Publish to GitHub Packages
         type: boolean
         default: true
+
 env:
+  # Keep the Node runtime and package scope consistent across both registries.
   NODE_VERSION: 24
   NPM_SCOPE: '@stoe'
+
 jobs:
   publish_npm:
+    # npm Trusted Publishing uses OIDC rather than a long-lived npm token.
     if: ${{ inputs.npm }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+
     concurrency:
       group: ${{ github.workflow }}-npm-${{ github.ref }}
       cancel-in-progress: true
+
     permissions:
       contents: read
       id-token: write
+
     env:
       CI: true
+
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@v7.0.1
+
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           scope: ${{ env.NPM_SCOPE }}
           registry-url: https://registry.npmjs.org
+
       - name: NPM config
         run: |
+          # Prevent package prepare scripts from running during CI installation.
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
+
       - name: NPM publish
         run: NODE_AUTH_TOKEN="" npm publish --access public --provenance
+
   publish_gh:
+    # The GitHub token is scoped to publishing packages from this repository.
     if: ${{ inputs.gh }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+
     concurrency:
       group: ${{ github.workflow }}-gh-${{ github.ref }}
       cancel-in-progress: true
+
     permissions:
       contents: read
       packages: write
       id-token: write
+
     env:
       CI: true
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@v7.0.1
+
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           scope: ${{ env.NPM_SCOPE }}
           registry-url: https://npm.pkg.github.com
+
       - name: NPM config
         run: |
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
+
       - name: GitHub Packages publish
         run: npm publish --access public

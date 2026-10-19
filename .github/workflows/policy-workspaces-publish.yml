@@ -1,4 +1,6 @@
-name: reusable publish (workspace package)
+name: Node.js workspace package publishing (reusable)
+
+# Callers choose which registries receive the workspace packages.
 on:
   workflow_call:
     inputs:
@@ -13,66 +15,88 @@ on:
     secrets:
       npm_token:
         required: false
+
 env:
+  # Share the Node runtime and package scope across both publish jobs.
   NODE_VERSION: 24
   NPM_SCOPE: '@stoe'
+
 jobs:
   publish_npm:
     name: Publish to NPM
+    # Use the supplied npm token for publishing and OIDC to generate provenance.
     if: ${{ inputs.npm }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+
     concurrency:
       group: ${{ github.workflow }}-npm-${{ github.ref }}
       cancel-in-progress: true
+
     permissions:
       contents: read
       packages: write
       id-token: write
+
     env:
       CI: true
       NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
+
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@v7.0.1
+
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           scope: ${{ env.NPM_SCOPE }}
           registry-url: https://registry.npmjs.org
+
       - name: NPM config
         run: |
+          # Avoid running package prepare scripts during dependency installation.
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
+
       - name: NPM publish
         run: npm publish --provenance --access public --workspaces
+
   publish_gh:
     name: Publish to GitHub
+    # Use the caller's GITHUB_TOKEN for GitHub Packages authentication.
     if: ${{ inputs.gh }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+
     concurrency:
       group: ${{ github.workflow }}-gh-${{ github.ref }}
       cancel-in-progress: true
+
     permissions:
       contents: read
       packages: write
+
     env:
       CI: true
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@v7.0.1
+
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           scope: ${{ env.NPM_SCOPE }}
           registry-url: https://npm.pkg.github.com
+
       - name: NPM config
         run: |
+          # Avoid running package prepare scripts during dependency installation.
           npm pkg delete scripts.prepare
           npm install --ignore-scripts --pure-lockfile
           git ls-files -z . | xargs -0 git update-index --assume-unchanged
+
       - name: GitHub Packages publish
         run: npm publish --access public --workspaces
